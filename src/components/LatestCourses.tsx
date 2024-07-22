@@ -6,8 +6,11 @@ import { cn } from "@/lib/utils";
 import CoursesSkeleton from "./skeletons/CoursesSkeleton";
 import AllCourses from "./AllCourses";
 import { buttonVariants } from "./ui/button";
+import { getAllCourses } from "@/actions/courses";
 
-const Courses = async () => {
+const LatestCourses = async () => {
+    const {data,status, message} = await getAllCourses({levels: [], take: 4, skip:0});
+  console.log(data)
   return (
     <section
       id="courses"
@@ -16,7 +19,7 @@ const Courses = async () => {
     >
       <div className="flex items-end justify-between">
         <div className="flex flex-col space-y-4">
-          <h2 className='text-xl md:text-5xl text-start  font-bold leading-[1.1]'>Browse all Courses</h2>
+          <h2 className='text-xl md:text-5xl text-start  font-bold leading-[1.1]'>Browse Latest Courses</h2>
         </div>
         <Link
           href="/courses"
@@ -25,11 +28,15 @@ const Courses = async () => {
           See All Courses <ArrowRight />
         </Link>
       </div>
+    
       <Suspense fallback={<CoursesSkeleton />}>
-        <AllCourses />
+      
+        <AllCourses 
+        //@ts-ignore
+         courses={data} />
       </Suspense>
       <Link
-        href="/products"
+        href="/courses"
         className={cn(
           buttonVariants(),
           "mx-auto bg-[#0369a1] flex w-fit hover:before:-translate-x-48"
@@ -42,4 +49,4 @@ const Courses = async () => {
   );
 };
 
-export default Courses;
+export default LatestCourses;
