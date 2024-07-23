@@ -1,15 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images: {
-      remotePatterns: [
-        {
-          protocol: "https",
-          hostname: "foundr.com",
-          pathname: "/**",
-        },
-      ],
-    },
-  };
-  
-  export default nextConfig;
-  
+  reactStrictMode: true,
+  swcMinify: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "foundr.com",
+        pathname: "/**",
+      },
+    ],
+  },
+};
+
+export default nextConfig;

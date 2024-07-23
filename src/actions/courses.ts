@@ -114,3 +114,4 @@ export const searchCourses = async (
 
   return coursesByLevels;
 };
+

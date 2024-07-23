@@ -9,7 +9,7 @@ import {
 
 const Page = () => {
   return (
-<Card className="max-w-lg mx-auto">
+<Card className="max-w-lg mx-auto mb-16 mt-5">
   <CardHeader className="space-y-1 text-center">
     <CardTitle className="text-2xl">Add Course</CardTitle>
     <CardDescription>Add a new course to the list</CardDescription>

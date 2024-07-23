@@ -4,7 +4,6 @@ import AllCourses from "@/components/AllCourses";
 import PaginationComponent from "@/components/PaginationComponent";
 import { Suspense } from "react";
 import CoursesSkeleton from "@/components/skeletons/CoursesSkeleton";
-import { Course } from "@prisma/client";
 import CourseFilter from "./course-filter";
 
 export default async function Page({

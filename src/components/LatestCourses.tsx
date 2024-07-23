@@ -9,8 +9,11 @@ import { buttonVariants } from "./ui/button";
 import { getAllCourses } from "@/actions/courses";
 
 const LatestCourses = async () => {
-    const {data,status, message} = await getAllCourses({levels: [], take: 4, skip:0});
-  console.log(data)
+  const { data, status, message } = await getAllCourses({
+    levels: [],
+    take: 4,
+    skip: 0,
+  });
   return (
     <section
       id="courses"
@@ -19,7 +22,9 @@ const LatestCourses = async () => {
     >
       <div className="flex items-end justify-between">
         <div className="flex flex-col space-y-4">
-          <h2 className='text-xl md:text-5xl text-start  font-bold leading-[1.1]'>Browse Latest Courses</h2>
+          <h2 className="text-xl md:text-5xl text-start  font-bold leading-[1.1]">
+            Browse Latest Courses
+          </h2>
         </div>
         <Link
           href="/courses"
@@ -28,12 +33,12 @@ const LatestCourses = async () => {
           See All Courses <ArrowRight />
         </Link>
       </div>
-    
+
       <Suspense fallback={<CoursesSkeleton />}>
-      
-        <AllCourses 
-        //@ts-ignore
-         courses={data} />
+        <AllCourses
+          //@ts-ignore
+          courses={data}
+        />
       </Suspense>
       <Link
         href="/courses"

@@ -9,9 +9,10 @@ type Props = {
 };
 
 const page = async ({ params }: Props) => {
+
+
   const { data } = await getAuthorByCourseSlug(params.courseSlug);
   const course = await getCourseBySlug(params.courseSlug);
-  console.log(data);
   return (
     <section>
       <CourseDetails //@ts-ignore

@@ -15,7 +15,6 @@ const PaginationComponent = ({ itemCount, pageSize, currentPage }: Props) => {
   const {replace} = useRouter();
   const searchParams = useSearchParams();
 
-  const displayPageCount = 3;
   const generatePaginationLinks = () => {
     const paginationLinks = [];
     const leftEllipsis = currentPage > 2;

@@ -11,7 +11,6 @@ import {
 } from "@nextui-org/navbar";
 import { Button } from "@nextui-org/button";
 import { Kbd } from "@nextui-org/kbd";
-import { Link } from "@nextui-org/link";
 import { Input } from "@nextui-org/input";
 import { link as linkStyles } from "@nextui-org/theme";
 import NextLink from "next/link";
@@ -20,6 +19,7 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { buttonVariants } from "../ui/button";
 import SearchButton from "../SearchButton";
+import Link from "next/link";
 
 export const Navbar = () => {
   //   const path = usePathname();
@@ -62,13 +62,12 @@ export const Navbar = () => {
       >
         <NavbarItem className="hidden sm:flex gap-2">
           <Link
-            href="/sign-in"
+            href="/courses/new"
             className={buttonVariants({
               size: "sm",
             })}
           >
-            Sign In
-            <span className="sr-only">Sign In</span>
+            Add Course
           </Link>
         </NavbarItem>
       </NavbarContent>
