@@ -1,9 +1,12 @@
 "use server";
+import slugify from "slugify";
 
 import { levels } from "@/config";
 import prisma from "@/lib/prisma";
+import { coursePayload, courseSchema } from "@/lib/Validators/course";
 import { SearchCourses } from "@/types/serachCourses";
 import { Author, Course } from "@prisma/client";
+import { z } from "zod";
 export const getAllCourses = async ({
   levels,
   take,
@@ -41,7 +44,6 @@ export const getAllCourses = async ({
       message: "Courses retrieved successfully",
     };
   } catch (error) {
-    console.error(error);
     return { status: 500, data: null, message: "Internal server error" };
   }
 };
@@ -115,3 +117,45 @@ export const searchCourses = async (
   return coursesByLevels;
 };
 
+export async function createCourse(payload: coursePayload): Promise<{
+  course: Course | null;
+  message: string;
+  status: number;
+}> {
+  try {
+    const { title, description, level, pricing, imageUrl } =
+      courseSchema.parse(payload);
+    const slug = slugify(title, { lower: true });
+
+    const course = await prisma.course.create({
+      data: {
+        title,
+        description,
+        slug,
+        levelId: level,
+        pricing,
+        authorId: "clyt8po91000027tq2ypyf4yx",
+        image: imageUrl,
+      },
+    });
+
+    return {
+      course: course,
+      message: "Course created successfully",
+      status: 201,
+    };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return {
+        status: 400,
+        message: error.errors.map((err) => err.message).join(", "),
+        course: null,
+      };
+    }
+    return {
+      course: null,
+      message: "Failed to create course",
+      status: 500,
+    };
+  }
+}

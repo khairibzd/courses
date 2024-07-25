@@ -19,3 +19,8 @@ export function formatPrice(price: number) {
     currency: "TND",
   }).format(price);
 }
+
+
+export function stringToArray(str: string): string[] {
+  return str.split(",").map((element) => element.trim());
+}

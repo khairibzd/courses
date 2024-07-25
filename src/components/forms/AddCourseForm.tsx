@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { courseSchema, coursePayload } from "@/lib/Validators/course";
@@ -21,25 +21,62 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { createCourse } from "@/actions/courses";
+import { useParams, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 type Props = {};
 
 function AddCourseForm({}: Props) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { replace } = useRouter();
   const form = useForm<coursePayload>({
     resolver: zodResolver(courseSchema),
     defaultValues: {
       title: "",
       description: "",
+      level: "",
+      pricing: 0,
+      imageUrl: "",
     },
   });
-
   const onSubmit = async (values: coursePayload) => {
-    console.log(values);
+    setIsLoading(true);
+
+    const { course: course, message, status } = await createCourse(values);
+
+    if (status === 201) {
+      toast.success(message);
+      replace(`/courses/${course?.slug}`);
+    } else {
+      toast.error(message);
+    }
+
+    setIsLoading(false);
   };
+  const handleFileUpload = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    field: any
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        // 10 MB limit
+        alert("File size exceeds the 10 MB limit.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        field.onChange(reader.result); // Convert file to data URL
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <Form {...form}>
       <form
-        className="grid w-full max-w-lg overflow-auto gap-5 justify-center items-center mx-auto"
+        className="grid w-full  overflow-auto gap-5 justify-center items-center"
         onSubmit={form.handleSubmit(onSubmit)}
       >
         <FormField
@@ -122,11 +159,31 @@ function AddCourseForm({}: Props) {
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="imageUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Image Upload</FormLabel>
+                <FormControl>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) => handleFileUpload(event, field)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
-        <Button>
+        <Button
+          //@ts-ignore
+          type="submit"
+          isLoading={isLoading}
+        >
           Add Course
-          <span className="sr-only">Add Course</span>
         </Button>
       </form>
     </Form>

@@ -5,6 +5,7 @@ import PaginationComponent from "@/components/PaginationComponent";
 import { Suspense } from "react";
 import CoursesSkeleton from "@/components/skeletons/CoursesSkeleton";
 import CourseFilter from "./course-filter";
+import { stringToArray } from "@/lib/utils";
 
 export default async function Page({
   searchParams,
@@ -14,10 +15,7 @@ export default async function Page({
     levels?: string;
   };
 }) {
-  function stringToArray(str: string): string[] {
-    return str.split(",").map((element) => element.trim());
-  }
-
+ 
   const levels = searchParams?.levels ? stringToArray(searchParams.levels) : [];
   const page = parseInt(searchParams?.page || "1");
   const pageSize = 4;

@@ -38,6 +38,7 @@ const LatestCourses = async () => {
         <AllCourses
           //@ts-ignore
           courses={data}
+          message={message}
         />
       </Suspense>
       <Link

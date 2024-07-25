@@ -58,7 +58,7 @@ function CourseDetails({ author, course }: Props) {
               </div>
             </div>
             <p className="text-sm text-blue-500 mt-5 uppercase">
-              Rating : {course.rating}
+              {/* Rating : {course.rating} */}
             </p>
           </div>
         </div>

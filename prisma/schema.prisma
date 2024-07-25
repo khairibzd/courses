@@ -19,7 +19,6 @@ model Course {
   slug          String       @unique
   title         String
   description   String?
-  rating        String
   levelId       String
   Level         Level    @relation(fields: [levelId], references: [slug])
   pricing       Int
@@ -28,6 +27,8 @@ model Course {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   Author        Author @relation(fields: [authorId], references: [id])
+  ratings       Rating[]     
+
   @@index([authorId])
 }
 
@@ -42,3 +43,19 @@ model Level {
   name     String
   courses Course[]
 }
+
+model Rating {
+  id         String   @id @default(cuid())
+  userId     String
+  rate       Float
+  courseId   String
+  course     Course   @relation(fields: [courseId], references: [id])
+}
+
+// enum Level {
+//   BEGINNER
+//   INTERMEDIATE
+//   EXPERT
+// }
+
+
