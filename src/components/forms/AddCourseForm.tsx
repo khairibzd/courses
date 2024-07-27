@@ -1,192 +1,133 @@
 "use client";
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { courseSchema, coursePayload } from "@/lib/Validators/course";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+
 import { createCourse } from "@/actions/courses";
 import { useParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import {
+  FileUploader,
+  FileUploaderContent,
+  FileUploaderItem,
+  FileInput,
+} from "../file-uploader/fule-uploader";
+import { FileSvgDraw } from "../file-uploader/file-upload-icon";
+import { useFormState, useFormStatus } from "react-dom";
 
-type Props = {};
+import { levels } from "@/config";
 
-function AddCourseForm({}: Props) {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { replace } = useRouter();
-  const form = useForm<coursePayload>({
-    resolver: zodResolver(courseSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      level: "",
-      pricing: 0,
-      imageUrl: "",
-    },
-  });
-  const onSubmit = async (values: coursePayload) => {
-    setIsLoading(true);
+import {
+  Autocomplete,
+  AutocompleteItem,
+  Button,
+  Input,
+  ModalBody,
+  ModalFooter,
+  Textarea,
+} from "@nextui-org/react";
 
-    const { course: course, message, status } = await createCourse(values);
+function AddCourseForm({ onClose }: { onClose: any }) {
+  const initialState = false;
 
-    if (status === 201) {
-      toast.success(message);
-      replace(`/courses/${course?.slug}`);
-    } else {
-      toast.error(message);
-    }
-
-    setIsLoading(false);
+  const [files, setFiles] = useState<File[] | null>([]);
+  const dropZoneConfig = {
+    maxFiles: 5,
+    maxSize: 1024 * 1024 * 4,
+    multiple: true,
   };
-  const handleFileUpload = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    field: any
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        // 10 MB limit
-        alert("File size exceeds the 10 MB limit.");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        field.onChange(reader.result); // Convert file to data URL
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+
+  //@ts-ignore
+  const [state, dispatch] = useFormState(createCourse, initialState);
 
   return (
-    <Form {...form}>
-      <form
-        className="grid w-full  overflow-auto gap-5 justify-center items-center"
-        onSubmit={form.handleSubmit(onSubmit)}
-      >
-        <FormField
-          control={form.control}
+    <form
+      className="grid w-full  overflow-auto gap-5 justify-center items-center"
+      action={dispatch}
+    >
+      <ModalBody>
+        <Input
+          label="Title"
           name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Type course title here." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          placeholder="Enter Course title"
+          type="text"
+          variant="bordered"
         />
-        <FormField
-          control={form.control}
+        <Textarea
+          label="Description"
           name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Type course description here."
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          placeholder="Enter course description"
+          className="max-w-xs"
         />
-        <div className="flex flex-col items-start gap-6 sm:flex-row">
-          <FormField
-            control={form.control}
-            name="level"
-            render={({ field }) => (
-              <FormItem className="flex-1 w-full">
-                <FormLabel>Level</FormLabel>
-                <Select
-                  value={field.value}
-                  onValueChange={(value: typeof field.value) =>
-                    field.onChange(value)
-                  }
-                >
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a level" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="w-full bg-gray-200">
-                    <SelectItem value="beginner">Beginner</SelectItem>
-                    <SelectItem value="intermediate">Intermediate</SelectItem>
-                    <SelectItem value="expert">Expert</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="pricing"
-            render={({ field }) => (
-              <FormItem className="flex-1 w-full">
-                <FormLabel>Price</FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <p className="absolute text-sm left-0 w-8 inset-y-0 grid place-items-center">
-                      DT
-                    </p>
-                    <Input
-                      type="number"
-                      className="pl-8"
-                      placeholder="0"
-                      {...field}
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="imageUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Image Upload</FormLabel>
-                <FormControl>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={(event) => handleFileUpload(event, field)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
 
-        <Button
-          //@ts-ignore
-          type="submit"
-          isLoading={isLoading}
+        <Autocomplete
+          defaultFilter={() => true}
+          label="levels"
+          name="level"
+          placeholder="Level"
+          type="text"
+          variant="bordered"
         >
-          Add Course
+          {levels.map((level) => (
+            <AutocompleteItem key={level.slug}>{level.slug}</AutocompleteItem>
+          ))}
+        </Autocomplete>
+        <Input
+          type="number"
+          label="Price"
+          name="pricing"
+          placeholder="0.00"
+          labelPlacement="outside"
+          endContent={
+            <div className="pointer-events-none flex items-center">
+              <span className="text-default-400 text-small">TND</span>
+            </div>
+          }
+        />
+
+        <FileUploader
+          className="relative rounded-lg bg-background p-2"
+          dropzoneOptions={dropZoneConfig}
+          value={files}
+          onValueChange={setFiles}
+        >
+          <FileInput className="outline-dashed outline-1 outline-white">
+            <div className="flex w-full flex-col items-center justify-center pb-4 pt-3 ">
+              <FileSvgDraw />
+            </div>
+          </FileInput>
+          <FileUploaderContent>
+            {files &&
+              files.length > 0 &&
+              files.map((file, i) => (
+                <FileUploaderItem key={i} index={i}>
+                  <span>{file.name}</span>
+                </FileUploaderItem>
+              ))}
+          </FileUploaderContent>
+        </FileUploader>
+      </ModalBody>
+
+      <ModalFooter>
+        <Button color="danger" variant="light" onPress={onClose}>
+          Close
         </Button>
-      </form>
-    </Form>
+        <CreateButton close={onClose} />
+      </ModalFooter>
+    </form>
+  );
+}
+
+function CreateButton({ close }: { close: any }) {
+  const status = useFormStatus();
+
+  return (
+    <Button
+      color="primary"
+      isLoading={status.pending}
+      type="submit"
+      onPress={() => setTimeout(close, 3000)}
+    >
+      Create Course
+    </Button>
   );
 }
 

@@ -1,10 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverActions: {
-      bodySizeLimit: "10mb", // Adjust the limit as needed (e.g., '5mb', '20mb')
-    },
-  },
   reactStrictMode: true,
   swcMinify: true,
   images: {
@@ -12,6 +7,11 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "foundr.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "iuvjdnjyfeheunqhisrq.supabase.co",
         pathname: "/**",
       },
     ],

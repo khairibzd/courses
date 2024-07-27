@@ -7,6 +7,8 @@ import { coursePayload, courseSchema } from "@/lib/Validators/course";
 import { SearchCourses } from "@/types/serachCourses";
 import { Author, Course } from "@prisma/client";
 import { z } from "zod";
+import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 export const getAllCourses = async ({
   levels,
   take,
@@ -117,45 +119,71 @@ export const searchCourses = async (
   return coursesByLevels;
 };
 
-export async function createCourse(payload: coursePayload): Promise<{
-  course: Course | null;
-  message: string;
-  status: number;
-}> {
-  try {
-    const { title, description, level, pricing, imageUrl } =
-      courseSchema.parse(payload);
-    const slug = slugify(title, { lower: true });
+export async function createCourse(prevState: any, formData: FormData) {
+  const image: any = formData.get("file");
+  let imageUrl = "";
 
-    const course = await prisma.course.create({
-      data: {
-        title,
-        description,
-        slug,
-        levelId: level,
-        pricing,
-        authorId: "clyt8po91000027tq2ypyf4yx",
-        image: imageUrl,
-      },
+  if (image.size != 0) {
+    imageUrl = await uploadFile(image);
+  }
+  const slug = slugify(formData.get("title") as any, { lower: true });
+  const course: Omit<
+    Course,
+    "id" | "image" | "authorId" | "createdAt" | "updatedAt"
+  > = {
+    title: formData.get("title") as any,
+    description: formData.get("description") as any,
+    slug: slug,
+    levelId: formData.get("level") as any,
+    pricing: parseInt(formData.get("pricing") as any),
+  };
+
+  const result = await prisma.course.create({
+    data: {
+      ...course,
+      authorId: "clyt8po91000027tq2ypyf4yx",
+      image: imageUrl,
+    },
+  });
+  revalidatePath("/courses/new");
+
+  revalidatePath("/");
+  revalidatePath("/courses");
+  return true;
+}
+
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
+async function uploadFile(file: File): Promise<string> {
+  const supabase = createClientComponentClient();
+  // const supabase = createClient();
+  const { data, error } = await supabase.storage
+    .from("course")
+    .upload(`courses/${file.name}`, file, {
+      cacheControl: "3600",
+      upsert: true,
     });
 
-    return {
-      course: course,
-      message: "Course created successfully",
-      status: 201,
-    };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return {
-        status: 400,
-        message: error.errors.map((err) => err.message).join(", "),
-        course: null,
-      };
-    }
-    return {
-      course: null,
-      message: "Failed to create course",
-      status: 500,
-    };
+  if (error) {
+    // Handle error
+    console.log(error);
+
+    return error.message;
+  } else {
+    const { data } = supabase.storage
+      .from("course")
+      .getPublicUrl(`courses/${file.name}`);
+
+    // console.log(data.publicUrl)
+    return data.publicUrl;
+    // console.log(data)
   }
+}
+
+async function deleteFile(filePath: string) {
+  const supabase = createClient();
+
+  const { data, error } = await supabase.storage
+    .from("courses")
+    .remove([filePath]);
 }

@@ -27,9 +27,7 @@ export const courseSchema = z.object({
     .max(100000000, {
       message: "Price must be lower than or equal to 100000000 TND",
     }),
-  imageUrl: z.string().url({
-    message: "Image URL must be a valid URL",
-  }),
+  // images: z.array(z.string()).optional(),
 });
 
 export type coursePayload = z.infer<typeof courseSchema>;
