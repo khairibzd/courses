@@ -20,6 +20,8 @@ import Image from "next/image";
 import { buttonVariants } from "../ui/button";
 import SearchButton from "../SearchButton";
 import Link from "next/link";
+import CreateMachineModel from "../models/create-course-model";
+import CreateCourseModel from "../models/create-course-model";
 
 export const Navbar = () => {
   //   const path = usePathname();
@@ -61,14 +63,7 @@ export const Navbar = () => {
         justify="end"
       >
         <NavbarItem className="hidden sm:flex gap-2">
-          <Link
-            href="/courses/new"
-            className={buttonVariants({
-              size: "sm",
-            })}
-          >
-            Add Course
-          </Link>
+          <CreateCourseModel />
         </NavbarItem>
       </NavbarContent>
 
