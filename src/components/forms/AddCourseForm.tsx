@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from "react";
 
-import { createCourse } from "@/actions/courses";
-import { useParams, useRouter } from "next/navigation";
+import { createCourse, getCourseBySlug } from "@/actions/courses";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import {
   FileUploader,
@@ -11,7 +11,6 @@ import {
   FileInput,
 } from "../file-uploader/fule-uploader";
 import { FileSvgDraw } from "../file-uploader/file-upload-icon";
-import { useFormState, useFormStatus } from "react-dom";
 
 import { levels } from "@/config";
 
@@ -24,9 +23,11 @@ import {
   ModalFooter,
   Textarea,
 } from "@nextui-org/react";
+import CreateButton from "../buttons/add-course-button";
 
 function AddCourseForm({ onClose }: { onClose: any }) {
   const initialState = false;
+  const { replace } = useRouter();
 
   const [files, setFiles] = useState<File[] | null>([]);
   const dropZoneConfig = {
@@ -35,13 +36,31 @@ function AddCourseForm({ onClose }: { onClose: any }) {
     multiple: true,
   };
 
+  // this is the client side validation to show the user a validation message
+  // the error message is thrown from the server action whether from zod or  another type of error (course already used)
+  const clientAction = async (formData: FormData) => {
+    try {
+      const result = await createCourse(formData);
+      if (result.success) {
+        toast.success(result.message);
+        // here after the user create the course whether he want to return to the same page when he was or redirect him to the course details that he just created
+        replace(`/courses/${result.slug}`); // Redirect if needed
+        onClose();
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+  // here we can directly call the dispatch function in the form action but without client validatio
   //@ts-ignore
-  const [state, dispatch] = useFormState(createCourse, initialState);
+  // const [state, dispatch] = useFormState(createCourse, initialState);
 
   return (
     <form
       className="grid w-full  overflow-auto gap-5 justify-center items-center"
-      action={dispatch}
+      action={clientAction}
     >
       <ModalBody>
         <Input
@@ -50,12 +69,13 @@ function AddCourseForm({ onClose }: { onClose: any }) {
           placeholder="Enter Course title"
           type="text"
           variant="bordered"
+          isRequired={true}
         />
         <Textarea
           label="Description"
           name="description"
           placeholder="Enter course description"
-          className="max-w-xs"
+          className="max-w-lg"
         />
 
         <Autocomplete
@@ -113,21 +133,6 @@ function AddCourseForm({ onClose }: { onClose: any }) {
         <CreateButton close={onClose} />
       </ModalFooter>
     </form>
-  );
-}
-
-function CreateButton({ close }: { close: any }) {
-  const status = useFormStatus();
-
-  return (
-    <Button
-      color="primary"
-      isLoading={status.pending}
-      type="submit"
-      onPress={() => setTimeout(close, 3000)}
-    >
-      Create Course
-    </Button>
   );
 }
 

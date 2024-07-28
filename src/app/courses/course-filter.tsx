@@ -32,7 +32,7 @@ export default function CourseFilter() {
   const [selectedLevels, setSelectedLevels] = useState([""]);
 
   const searchParams = useSearchParams();
-  const pathname = usePathname();
+    const pathname = usePathname();
   const { replace } = useRouter();
 
   const pressFilter = () => {

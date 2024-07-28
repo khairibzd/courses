@@ -23,6 +23,7 @@ function CourseDetails({ author, course }: Props) {
             src={course.image}
             height={100}
             width={100}
+            priority
             alt={course.title}
             className="object-cover w-full lg:mx-6 lg:w-1/2 rounded-xl h-72 lg:h-96 border-small border-gray-300 shadow-sm  "
           />

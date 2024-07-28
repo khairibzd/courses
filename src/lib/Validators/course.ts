@@ -16,7 +16,8 @@ export const courseSchema = z.object({
       message: "Description must contain at most 500 character(s)",
     })
     .optional(),
-  level: z.string().min(1),
+  
+  levelId: z.string().min(1),
   pricing: z.coerce
     .number({
       required_error: "Price must be filled",
@@ -27,7 +28,18 @@ export const courseSchema = z.object({
     .max(100000000, {
       message: "Price must be lower than or equal to 100000000 TND",
     }),
-  // images: z.array(z.string()).optional(),
-});
+  });
 
 export type coursePayload = z.infer<typeof courseSchema>;
+
+
+
+export const validateCourseData = (formData: FormData) => {
+  const data = {
+    title: formData.get("title") as string,
+    description: formData.get("description") as string,
+    pricing: parseInt(formData.get("pricing") as string),
+    levelId: formData.get("level") as string,
+  };
+  return courseSchema.safeParse(data);
+};
